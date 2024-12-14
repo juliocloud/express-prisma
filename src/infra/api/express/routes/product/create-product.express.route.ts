@@ -1,3 +1,5 @@
+import { Request, Response } from "express";
+import { CreateProductInputDto, CreateProductUseCase } from "../../../../../usecases/create-product/create-product.usecase";
 import { Usecase } from "../../../../../usecases/usecase";
 import { HttpMethod, Route } from "../route";
 
@@ -9,6 +11,46 @@ export class CreateProductRoute implements Route {
     private constructor (
         private readonly path: string,
         private readonly method: HttpMethod,
-        private readonly createProductService: Usecase
-    )
+        private readonly createProductService: CreateProductUseCase
+    ) {}
+
+    public static create(createProductService: CreateProductUseCase){
+        return new CreateProductRoute(
+            '/products',
+            HttpMethod.POST,
+            createProductService
+        )
+    }
+
+    public getHandler() {
+        return async (request: Request, response: Response) => {
+            const { name, price } = request.body
+
+            const input: CreateProductInputDto = {
+                name, 
+                price
+            }
+
+            const output: CreateProductResponseDto = 
+                await this.createProductService.execute(input);
+
+            const responseBody = this.present(output)
+
+            response.status(201).json(responseBody)
+        }
+    }
+
+    public getPath(): string {
+        return this.path
+    }
+
+    public getMethod(): HttpMethod {
+        return this.method
+    }
+
+    private present(input: CreateProductResponseDto): CreateProductResponseDto {
+        const response = { id: input.id}
+
+        return response
+    }
 }
