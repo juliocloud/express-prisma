@@ -1,19 +1,22 @@
 import { ProductGateway } from "../../domain/gateway/product.gateway"
-import { Product, ProductProps } from "../../domain/product/entity/product"
+import { Product } from "../../domain/product/entity/product"
 import { Usecase } from "../usecase"
 
 export type ListProductInputDto = void 
 
-export type ListProductOutpuDto = {
-    products: ProductProps[]
+export type ListProductOutpuDto = {    
+    products: {
+        id: string;
+        name: string;
+        price: number;
+        quantity: number;
+}[];
 }
 
 export class ListProductUsecase 
     implements Usecase<ListProductInputDto, ListProductOutpuDto> {
     
-    private constructor(private readonly productGateway: ProductGateway){
-        return new ListProductUsecase(productGateway)
-    }
+    private constructor(private readonly productGateway: ProductGateway){}
 
     public static create(productGateway: ProductGateway){
         return new ListProductUsecase(productGateway)
