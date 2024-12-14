@@ -1,4 +1,5 @@
-import { ListProductUsecase } from "../../../../../usecases/list-product/list-product.usecase";
+import { Request, Response } from "express";
+import { ListProductInputDto, ListProductOutpuDto, ListProductUsecase } from "../../../../../usecases/list-product/list-product.usecase";
 import { HttpMethod, Route } from "../route";
 
 export type ListProductResponseDto = {
@@ -23,6 +24,34 @@ export class ListProductRoute implements Route {
             listProductService
         )
 
-         
+    }
+
+    public getHandler(): (request: Request, response: Response) => Promise<void> {
+        return async (request: Request, response: Response) => {
+            const output = await this.listProductService.execute()
+
+            const responseBody = this.present(output)
+
+            response.status(200).json(responseBody).send()
+        }
+    }
+
+    public getPath(): string {
+        return this.path
+    }
+
+    public getMethod(): HttpMethod {
+        return this.method
+    }
+    private present(input: ListProductOutpuDto): ListProductResponseDto {
+        const response: ListProductResponseDto = {
+            products: input.products.map((product) => ({
+                id: product.id,
+                name: product.name,
+                price: product.price
+            }))
+        }
+
+        return response;
     }
 }
